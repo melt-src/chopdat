@@ -5,16 +5,29 @@
 
 #include <stddef.h>
 
-struct csv_table_t;
-typedef struct csv_table_t * csv_table;
+typedef struct chopdat_csv_table chopdat_csv_table;
+typedef struct chopdat_token chopdat_token;
+typedef enum chopdat_csv_perror
+{
+    CHOPDAT_CSV_NOERR = 0,
+    CHOPDAT_CSV_SYNTAX
+} chopdat_csv_perror;
 
-csv_table chopdat_csv_table_create(void);
-void chopdat_csv_table_destroy(csv_table);
-size_t chopdat_csv_table_nofrows(csv_table);
-size_t chopdat_csv_table_nofcols(csv_table);
+char *chopdat_slurp_file(const char *, size_t *);
+
+chopdat_token *chopdat_token_create(char *, size_t);
+void chopdat_token_destroy(chopdat_token *);
+char *chopdat_token_start(chopdat_token *);
+size_t chopdat_token_length(chopdat_token *);
+void chopdat_token_spit(chopdat_token *);
+
+int chopdat_csv_table_create(chopdat_csv_table **);
+int chopdat_csv_table_destroy(chopdat_csv_table *);
+size_t chopdat_csv_table_nrows(chopdat_csv_table *);
+size_t chopdat_csv_table_ncols(chopdat_csv_table *);
 
 int chopdat_csv_file(const char *);
 
-#endif
+#endif /* CHOPDAT_H */
 
 /* chopdat.h ends here */

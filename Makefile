@@ -5,11 +5,18 @@ CC = gcc
 # ----------+ LINKING & COMPILING +----------
 all : test
 
-test : main.o chopdat.o
-	$(CC) $(CFLAGS) main.o chopdat.o -o test
+test : main.o chopdat.o dvector_ptr.o
+	$(CC) $(CFLAGS) main.o chopdat.o dvector_ptr.o -o test
+	etags *.[ch]
 
 chopdat.o : chopdat.c chopdat.h
 	$(CC) $(CFLAGS) -c chopdat.c -o chopdat.o
 
-main.o : main.c chopdat.h
+dvector_ptr.o : dvector_ptr.c dvector.h
+	$(CC) $(CFLAGS) -c dvector_ptr.c -o dvector_ptr.o
+
+main.o : main.c chopdat.h dvector.h
 	$(CC) $(CFLAGS) -c main.c -o main.o
+
+tags:
+	etags *.[ch]

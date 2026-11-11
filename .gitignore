@@ -1,4 +1,6 @@
 *.o
 *.s
+input*
 main
 test
+TAGS
