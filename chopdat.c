@@ -53,13 +53,6 @@ size_t chopdat_token_length(chopdat_token *t)
     return t->length;
 }
 
-void chopdat_token_spit(chopdat_token *t)
-{
-    if (!t || !t->start) return;
-
-    fwrite(t->start, 1, t->length, stdout);
-}
-
 char *chopdat_slurp_file(const char *file_path, size_t *size)
 {
     char *buffer = NULL;
@@ -91,6 +84,59 @@ error:
     if (f) fclose(f);
     if (buffer) free(buffer);
     return NULL;
+}
+
+chopdat_csv_table *chopdat_csv_table_create(void)
+{
+    chopdat_csv_table *t = malloc(sizeof(*t));
+
+    if (!t) return NULL;
+
+    t->tokens = dvector_create();
+
+    if (!t->tokens) return NULL;
+
+    t->rows = 0;
+    t->columns = 0;
+
+    return t;
+}
+
+void chopdat_csv_table_destroy(chopdat_csv_table *t)
+{
+    if (!t) return;
+    dvector_destroy(t->tokens);
+    free(t);
+}
+
+size_t chopdat_csv_table_nrows(chopdat_csv_table *t)
+{
+    if (!t) return 0;
+    return t->rows;
+}
+
+size_t chopdat_csv_table_ncols(chopdat_csv_table *t)
+{
+    if (!t) return 0;
+    return t->columns;
+}
+
+int chopdat_csv_table_eattok(chopdat_csv_table *a, chopdat_token *o)
+{
+    if (!a) return 1;
+    if (!o) return 2;
+    if (dvector_append(a->tokens, o) > 0) return 3;
+    return 0;
+}
+
+void chopdat_table_spittok(chopdat_csv_table *a, size_t o)
+{
+    if (!a) return;
+    dvector *v = a->tokens;
+
+    for (size_t i = 0; i < dvector_size(v); i++) {
+        chopdat_token *t = dvector_get_element
+        fwrite(o->start, 1,o->length, stdout);
 }
 
 /* chopdat.c ends here*/

@@ -25,9 +25,15 @@ int main(int argc, char **argv)
 
     printf("%ldB\n%s\n", *content_size, content);
 
-    /* printing a token */
-    chopdat_token *t = chopdat_token_create(&content[1],5);
-    chopdat_token_spit(t);
+    /* creatining a token */
+    chopdat_token *a = chopdat_token_create(&content[1],5);
+    chopdat_token *b = chopdat_token_create(&content[15],4);
+
+    /* creating a csv table */
+    chopdat_csv_table *table = chopdat_csv_table_create();
+    chopdat_csv_table_addtok(table, a);
+    chopdat_csv_table_addtok(table, b);
+
 
     return 0;
 }
