@@ -15,19 +15,21 @@ int main(int argc, char **argv)
     const char *file_path = argv[1];
 
     /* reading a file into memory */
-    size_t *content_size = malloc(sizeof(size_t));
-    char *content = chopdat_slurp_file(file_path, content_size);
+    chopdat_buffer *buffer = chopdat_buffer_create(file_path);
 
-    if (!content) {
+    if (!buffer) {
         fprintf(stderr, "error: could not read file into memory.\n");
         exit(1);
     }
 
-    printf("\n%ldB\n%s\n", *content_size, content);
+    size_t s = chopdat_buffer_size(buffer);
+    char *c = chopdat_buffer_content(buffer);
+
+    printf("\n%ldB\n%s\n", s, c);
 
     /* creatining a token */
-    chopdat_token *a = chopdat_token_create(&content[1],5);
-    chopdat_token *b = chopdat_token_create(&content[15],4);
+    chopdat_token *a = chopdat_token_create(&c[1],5);
+    chopdat_token *b = chopdat_token_create(&c[15],4);
 
     /* creating a csv table and adding tokens */
     chopdat_csv_table *table = chopdat_csv_table_create();
@@ -37,7 +39,7 @@ int main(int argc, char **argv)
 
     /* freeing memory */
     chopdat_csv_table_destroy(table);
-    free(content);
+    chopdat_buffer_destroy(buffer);
 
     return 0;
 }

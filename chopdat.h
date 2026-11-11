@@ -7,6 +7,8 @@
 
 typedef struct chopdat_csv_table chopdat_csv_table;
 typedef struct chopdat_token chopdat_token;
+typedef struct chopdat_buffer chopdat_buffer;
+
 typedef enum chopdat_csv_perror
 {
     CHOPDAT_CSV_NOERR = 0,
@@ -14,6 +16,11 @@ typedef enum chopdat_csv_perror
 } chopdat_csv_perror;
 
 char *chopdat_slurp_file(const char *, size_t *);
+
+chopdat_buffer *chopdat_buffer_create(const char *);
+void chopdat_buffer_destroy(chopdat_buffer *);
+char *chopdat_buffer_content(chopdat_buffer *);
+int chopdat_buffer_size(chopdat_buffer *);
 
 chopdat_token *chopdat_token_create(char *, size_t);
 void chopdat_token_destroy(chopdat_token *);
