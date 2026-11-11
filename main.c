@@ -4,6 +4,9 @@
 
 #define MIN_NARGS 2
 
+/* TEST
+ *
+ * This file only purpose is to test library features. */
 int main(int argc, char **argv)
 {
     /* arguments parsing */
@@ -27,11 +30,11 @@ int main(int argc, char **argv)
 
     printf("\n%ldB\n%s\n", s, c);
 
-    /* creatining a token */
-    chopdat_token *a = chopdat_token_create(&c[1],5);
-    chopdat_token *b = chopdat_token_create(&c[15],4);
+    /* lexing simulation: manually creatining tokens */
+    chopdat_token *a = chopdat_token_create(&c[1], 5);
+    chopdat_token *b = chopdat_token_create(&c[15], 4);
 
-    /* creating a csv table and adding tokens */
+    /* parsing simulation: creating a csv table and manually adding tokens */
     chopdat_csv_table *table = chopdat_csv_table_create();
     chopdat_csv_table_eattok(table, a);
     chopdat_csv_table_eattok(table, b);

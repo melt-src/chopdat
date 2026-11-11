@@ -1,4 +1,11 @@
-/* chopdat.h */
+/* ============================ | --------------- | ============================
+ *
+ * ChopDat!
+ *
+ * This header file provides the prototipes of structured data and
+ * functions implementing basic text parsing. See doc files for more.
+ *
+ * ============================ | --------------- | ========================== */
 
 #ifndef CHOPDAT_H
 #define CHOPDAT_H
