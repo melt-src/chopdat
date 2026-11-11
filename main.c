@@ -31,9 +31,10 @@ int main(int argc, char **argv)
 
     /* creating a csv table */
     chopdat_csv_table *table = chopdat_csv_table_create();
-    chopdat_csv_table_addtok(table, a);
-    chopdat_csv_table_addtok(table, b);
+    chopdat_csv_table_eattok(table, a);
+    chopdat_csv_table_eattok(table, b);
 
+    chopdat_csv_table_spittok(table);
 
     return 0;
 }

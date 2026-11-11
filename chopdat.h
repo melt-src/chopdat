@@ -25,7 +25,7 @@ void chopdat_csv_table_destroy(chopdat_csv_table *);
 size_t chopdat_csv_table_nrows(chopdat_csv_table *);
 size_t chopdat_csv_table_ncols(chopdat_csv_table *);
 int chopdat_csv_table_eattok(chopdat_csv_table *, chopdat_token *);
-void void chopdat_table_spittok(chopdat_token *);
+void chopdat_csv_table_spittok(chopdat_csv_table *);
 
 int chopdat_csv_file(const char *);
 

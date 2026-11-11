@@ -129,14 +129,15 @@ int chopdat_csv_table_eattok(chopdat_csv_table *a, chopdat_token *o)
     return 0;
 }
 
-void chopdat_table_spittok(chopdat_csv_table *a, size_t o)
+void chopdat_csv_table_spittok(chopdat_csv_table *a)
 {
     if (!a) return;
     dvector *v = a->tokens;
 
-    for (size_t i = 0; i < dvector_size(v); i++) {
-        chopdat_token *t = dvector_get_element
-        fwrite(o->start, 1,o->length, stdout);
+    for (int i = 0; i < dvector_length(v); i++) {
+        chopdat_token *t = dvector_get_element(v, i);
+        fwrite(t->start, 1, t->length, stdout);
+    }
 }
 
 /* chopdat.c ends here*/
