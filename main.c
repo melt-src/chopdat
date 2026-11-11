@@ -23,18 +23,21 @@ int main(int argc, char **argv)
         exit(1);
     }
 
-    printf("%ldB\n%s\n", *content_size, content);
+    printf("\n%ldB\n%s\n", *content_size, content);
 
     /* creatining a token */
     chopdat_token *a = chopdat_token_create(&content[1],5);
     chopdat_token *b = chopdat_token_create(&content[15],4);
 
-    /* creating a csv table */
+    /* creating a csv table and adding tokens */
     chopdat_csv_table *table = chopdat_csv_table_create();
     chopdat_csv_table_eattok(table, a);
     chopdat_csv_table_eattok(table, b);
-
     chopdat_csv_table_spittok(table);
+
+    /* freeing memory */
+    chopdat_csv_table_destroy(table);
+    free(content);
 
     return 0;
 }

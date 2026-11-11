@@ -19,39 +19,6 @@ struct chopdat_csv_table
     size_t columns;
 };
 
-chopdat_token *chopdat_token_create(char *s, size_t l)
-{
-    chopdat_token *t = malloc(sizeof(*t));
-
-    if (!t) return NULL;
-
-    t->start = s;
-    t->length = l;
-
-    return t;
-}
-
-void chopdat_token_destroy(chopdat_token *t)
-{
-    if (!t) return;
-
-    free(t->start);
-    free(t);
-
-    return;
-}
-
-char *chopdat_token_start(chopdat_token *t)
-{
-    if (!t) return NULL;
-    return t->start;
-}
-
-size_t chopdat_token_length(chopdat_token *t)
-{
-    if (!t) return 0;
-    return t->length;
-}
 
 char *chopdat_slurp_file(const char *file_path, size_t *size)
 {
@@ -86,6 +53,37 @@ error:
     return NULL;
 }
 
+chopdat_token *chopdat_token_create(char *s, size_t l)
+{
+    chopdat_token *t = malloc(sizeof(*t));
+
+    if (!t) return NULL;
+
+    t->start = s;
+    t->length = l;
+
+    return t;
+}
+
+void chopdat_token_destroy(chopdat_token *t)
+{
+    if (!t) return;
+    free(t);
+    return;
+}
+
+char *chopdat_token_start(chopdat_token *t)
+{
+    if (!t) return NULL;
+    return t->start;
+}
+
+size_t chopdat_token_length(chopdat_token *t)
+{
+    if (!t) return 0;
+    return t->length;
+}
+
 chopdat_csv_table *chopdat_csv_table_create(void)
 {
     chopdat_csv_table *t = malloc(sizeof(*t));
@@ -105,7 +103,15 @@ chopdat_csv_table *chopdat_csv_table_create(void)
 void chopdat_csv_table_destroy(chopdat_csv_table *t)
 {
     if (!t) return;
-    dvector_destroy(t->tokens);
+
+    dvector *v = t->tokens;
+    int m = dvector_length(v);
+
+    for (int i = 0; i < m; i++) {
+        chopdat_token_destroy(dvector_get_element(v, i));
+    }
+
+    dvector_destroy(v);
     free(t);
 }
 
@@ -132,11 +138,18 @@ int chopdat_csv_table_eattok(chopdat_csv_table *a, chopdat_token *o)
 void chopdat_csv_table_spittok(chopdat_csv_table *a)
 {
     if (!a) return;
-    dvector *v = a->tokens;
 
-    for (int i = 0; i < dvector_length(v); i++) {
+    dvector *v = a->tokens;
+    int m = dvector_length(v);
+
+    if (m < 0) return;
+
+    for (int i = 0; i < m; i++) {
         chopdat_token *t = dvector_get_element(v, i);
-        fwrite(t->start, 1, t->length, stdout);
+        if (t) {
+            fwrite(t->start, 1, t->length, stdout);
+            putchar('\n');
+        }
     }
 }
 
