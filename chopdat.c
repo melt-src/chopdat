@@ -154,7 +154,7 @@ void chopdat_csv_table_destroy(chopdat_csv_table *t)
         chopdat_token_destroy(dvector_get_element(v, i));
     }
 
-    // dvector_destroy(v);
+    dvector_destroy(v);
     free(t);
 }
 
