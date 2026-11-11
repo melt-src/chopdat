@@ -1,0 +1,3 @@
+[submodule "lib/dvector"]
+	path = lib/dvector
+	url = melt-hub:melt-hub/dvector.git
