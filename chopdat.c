@@ -1,10 +1,10 @@
 /* chopdat.c */
 
-#include "chopdat.h"
-#include "dvector.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "chopdat.h"
+#include "dvector/dvector.h"
 
 struct chopdat_token
 {
