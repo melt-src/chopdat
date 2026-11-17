@@ -255,7 +255,22 @@ static chopdat_csv_table *records(chopdat_csv_table *t, chopdat_buffer *b)
     return clrf(t, b);
 }
 
-static void enclosed_token(chopdat_csv_table *t, chopdat_buffer *b);
+static void enclosed_token(chopdat_csv_table *t, chopdat_buffer *b) {
+    t = dquote(t, b);
+
+    if (t->error != CHOPDAT_CSV_NOERR) {
+        return t;
+    }
+
+    t = token(t, b);
+
+    if (t->error != CHOPDAT_CSV_NOERR) {
+        return t;
+    }
+
+    return dquote(t, b);
+}
+
 
 static void token(chopdat_csv_table *t, chopdat_buffer *b) {
 
