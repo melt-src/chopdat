@@ -8,8 +8,39 @@
 
   The library provides CSV parsing features through a recursive descent
   approach. The supported context-free grammar is a simplified version of the
-  official CSV grammar from [[https://www.rfc-editor.org/rfc/rfc4180][RFC 4180]], written in [[https://en.wikipedia.org/wiki/Backus%E2%80%93Naur_form][BNF]] (Backus-Naur Form). This
-  simplified grammar assumes that:
+  official CSV grammar from [[https://www.rfc-editor.org/rfc/rfc4180][RFC 4180]], written in [[https://en.wikipedia.org/wiki/Backus%E2%80%93Naur_form][BNF]] (Backus-Naur Form); in
+  classic matemathical language:
+
+  #+begin_latex
+
+  $$
+  \mathcal{G}=\begin{cases}
+\Sigma=\{\texttt{\textbackslash r},\ \texttt{\textbackslash n},\ \texttt{,},\ \texttt{"}\}\ \cup\ \{\texttt{␣}..\texttt{!}\}\ \cup\ \{\texttt{\#}..\texttt{+}\}\ \cup\ \{\texttt{-}..\texttt{\textasciitilde}\}\\
+\mathcal{V}=\{R,E,W\}\\
+\mathcal{T}=\{C_R,\ L,\ C_F,\ C_M,\ D,\ T\}\\
+\mathcal{P}= \begin{cases}
+R\Rightarrow E\ C_M\ R \\
+R\Rightarrow E\ C_F \\
+R\Rightarrow \varepsilon \\
+E\Rightarrow D\ W\ D \\
+W\Rightarrow T\ W \\
+W\Rightarrow T \\
+C_R\Rightarrow \texttt{\textbackslash r} \\
+L\Rightarrow \texttt{\textbackslash n} \\
+C_F\Rightarrow C_R\ L \\
+C_M\Rightarrow \texttt{,} \\
+D\Rightarrow \texttt{"} \\
+T\Rightarrow \{\texttt{␣}..\texttt{!}\} \\
+T\Rightarrow \{\texttt{\#}..\texttt{+}\} \\
+T\Rightarrow \{\texttt{-}..\texttt{\textasciitilde}\}
+\end{cases} \\
+\mathcal{S}=R
+\end{cases}
+  $$
+
+  #+end_latex
+
+  This simplified grammar assumes that:
 
   * a CSV file is a sequence of =records= (/including the empty sequence/),
   * a record is structured into =enclosed_fields= (/fields enclosed by double
