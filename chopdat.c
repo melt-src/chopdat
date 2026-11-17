@@ -8,8 +8,8 @@
 #include "dvector/dvector.h"
 
 static chopdat_csv_table *records(chopdat_csv_table *t, chopdat_buffer *b);
-static chopdat_csv_table *enclosed_field(chopdat_csv_table *t, chopdat_buffer *b);
-static chopdat_csv_table *word(chopdat_csv_table *t, chopdat_buffer *b);
+static chopdat_csv_table *enclosed_token(chopdat_csv_table *t, chopdat_buffer *b);
+static chopdat_csv_table *token(chopdat_csv_table *t, chopdat_buffer *b);
 static chopdat_csv_table *comma(chopdat_csv_table *t, chopdat_buffer *b);
 static chopdat_csv_table *clrf(chopdat_csv_table *t, chopdat_buffer *b);
 static chopdat_csv_table *dquote(chopdat_csv_table *t, chopdat_buffer *b);
@@ -232,7 +232,7 @@ chopdat_csv_table *chopdat_csv(chopdat_buffer *b)
 
 static chopdat_csv_table *records(chopdat_csv_table *t, chopdat_buffer *b)
 {
-    t = enclosed_field(t, b);
+    t = enclosed_token(t, b);
 
     if (t->error != CHOPDAT_CSV_NOERR) return t;
 
@@ -241,7 +241,7 @@ static chopdat_csv_table *records(chopdat_csv_table *t, chopdat_buffer *b)
 
     if (t->error != CHOPDAT_CSV_NOERR) {
         for (size_t i = 0; i < s; i++) {
-            t = enclosed_field(t, b);
+            t = enclosed_token(t, b);
 
             if (t->error != CHOPDAT_CSV_NOERR) return t;
 
@@ -255,9 +255,10 @@ static chopdat_csv_table *records(chopdat_csv_table *t, chopdat_buffer *b)
     return clrf(t, b);
 }
 
-static void enclosed_field(chopdat_csv_table *t, chopdat_buffer *b);
+static void enclosed_token(chopdat_csv_table *t, chopdat_buffer *b);
 
-static void word(chopdat_csv_table *t, chopdat_buffer *b);
+static void token(chopdat_csv_table *t, chopdat_buffer *b) {
+
 
 static chopdat_csv_table *comma(chopdat_csv_table *t, chopdat_buffer *b) {
     if (b->content != ',') {
@@ -281,10 +282,19 @@ static chopdat_csv_table *clrf(chopdat_csv_table *t, chopdat_buffer *b) {
     return t;
 }
 
-static void dquote(chopdat_csv_table *t, chopdat_buffer *b);
+static void dquote(chopdat_csv_table *t, chopdat_buffer *b) {
+    if (b->content != '"') {
+        t->error = CHOPDAT_CSV_SYNTAX;
+    }
+    return t;
+}
 
-static void textdata(chopdat_csv_table *t, chopdat_buffer *b);
-
-
+static void textdata(chopdat_csv_table *t, chopdat_buffer *b) {
+    char *c = b->content;
+    if (!(c <= 0x10FFFF && c != 0x0A && c != 0x0D && c != 0x22)) {
+        t->error = CHOPDAT_CSV_SYNTAX;
+    }
+    return t;
+}
 
 /* chopdat.c ends here*/

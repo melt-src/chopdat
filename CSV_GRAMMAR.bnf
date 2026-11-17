@@ -1,13 +1,11 @@
 
-records = enclosed_field COMMA records / enclosed_field CRLF / e
+records = enclosed_token COMMA records / enclosed_token CRLF / e
 
-enclosed_field = DQUOTE word DQUOTE
+enclosed_token = DQUOTE token DQUOTE
 
-word = TEXTDATA word / TEXTDATA
+token = TEXTDATA token / TEXTDATA
 
-CR = %x0D
-LF = %x0A
-CRLF = CR LF
+CRLF = %x0D%x0A
 COMMA = %x2C
 DQUOTE = %x22
-TEXTDATA =  %x20-21 / %x23-2B / %x2D-7E
+TEXTDATA = %x00-09 / %x0B-0C / %x0E-21 / %x23-10FFFF

@@ -11,44 +11,29 @@
   official CSV grammar from [[https://www.rfc-editor.org/rfc/rfc4180][RFC 4180]], written in [[https://en.wikipedia.org/wiki/Backus%E2%80%93Naur_form][BNF]] (Backus-Naur Form); in
   classic matemathical language:
 
-  #+begin_latex
+  #+begin_src bnf
 
-  $$
-  \mathcal{G}=\begin{cases}
-\Sigma=\{\texttt{\textbackslash r},\ \texttt{\textbackslash n},\ \texttt{,},\ \texttt{"}\}\ \cup\ \{\texttt{␣}..\texttt{!}\}\ \cup\ \{\texttt{\#}..\texttt{+}\}\ \cup\ \{\texttt{-}..\texttt{\textasciitilde}\}\\
-\mathcal{V}=\{R,E,W\}\\
-\mathcal{T}=\{C_R,\ L,\ C_F,\ C_M,\ D,\ T\}\\
-\mathcal{P}= \begin{cases}
-R\Rightarrow E\ C_M\ R \\
-R\Rightarrow E\ C_F \\
-R\Rightarrow \varepsilon \\
-E\Rightarrow D\ W\ D \\
-W\Rightarrow T\ W \\
-W\Rightarrow T \\
-C_R\Rightarrow \texttt{\textbackslash r} \\
-L\Rightarrow \texttt{\textbackslash n} \\
-C_F\Rightarrow C_R\ L \\
-C_M\Rightarrow \texttt{,} \\
-D\Rightarrow \texttt{"} \\
-T\Rightarrow \{\texttt{␣}..\texttt{!}\} \\
-T\Rightarrow \{\texttt{\#}..\texttt{+}\} \\
-T\Rightarrow \{\texttt{-}..\texttt{\textasciitilde}\}
-\end{cases} \\
-\mathcal{S}=R
-\end{cases}
-  $$
+  records = enclosed_token COMMA records / enclosed_token CRLF / e
 
-  #+end_latex
+  enclosed_token = DQUOTE token DQUOTE
+
+  token = TEXTDATA token / TEXTDATA
+
+  CRLF = %x0D%x0A
+  COMMA = %x2C
+  DQUOTE = %x22
+  TEXTDATA = %x00-09 / %x0B-0C / %x0E-21 / %x23-10FFFF
+
+  #+end_src
 
   This simplified grammar assumes that:
 
   * a CSV file is a sequence of =records= (/including the empty sequence/),
-  * a record is structured into =enclosed_fields= (/fields enclosed by double
-    quotes/), separated by =COMMA= (s) and ending in a =CRLF= (/i.e. Carriage Return,
-    Line Feed/),
-  * an enclosed field is structured as a =word= enclosed in =DQUOTE= (s) (/double quotes/),
-  * a =word= is a sequence of *at least* one unicode character, except from
-    commas, double quotes and new lines.
+  * a record is structured into =enclosed_token= (s) separated by =COMMA= (s) and
+    ending in a =CRLF= (/i.e. Carriage Return, Line Feed/),
+  * an =enclosed_token= is structured as a =token= enclosed in =DQUOTE= (s) (/double quotes/),
+  * a =token= is a sequence of *at least* one unicode character, except from double
+    quotes, carriage returns and new lines.
 
   Imposing such limitations to the original grammar, thus to the language it
   generates, largely eases the complexity of our parser. Nonetheless, being this
