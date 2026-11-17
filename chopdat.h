@@ -18,7 +18,9 @@ typedef struct chopdat_buffer chopdat_buffer;
 
 typedef enum chopdat_csv_perror
 {
+    CHOPDAT_CSV_NOTABLE = -1,
     CHOPDAT_CSV_NOERR = 0,
+    CHOPDAT_CSV_NULLBUF,
     CHOPDAT_CSV_SYNTAX
 } chopdat_csv_perror;
 
@@ -38,10 +40,11 @@ chopdat_csv_table *chopdat_csv_table_create(void);
 void chopdat_csv_table_destroy(chopdat_csv_table *);
 size_t chopdat_csv_table_nrows(chopdat_csv_table *);
 size_t chopdat_csv_table_ncols(chopdat_csv_table *);
+chopdat_csv_perror chopdat_csv_table_errcode(chopdat_csv_table *);
 int chopdat_csv_table_eattok(chopdat_csv_table *, chopdat_token *);
 void chopdat_csv_table_spittok(chopdat_csv_table *);
 
-chopdat_csv_table *chopdat_csv(const char *);
+chopdat_csv_table *chopdat_csv(chopdat_buffer *);
 
 #endif /* CHOPDAT_H */
 

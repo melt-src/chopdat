@@ -8,48 +8,16 @@
 
   The library provides CSV parsing features through a recursive descent
   approach. The supported context-free grammar is a simplified version of the
-  official CSV grammar from [[https://www.rfc-editor.org/rfc/rfc4180][RFC 4180]], written in [[https://www.rfc-editor.org/rfc/rfc2234][ABNF]] (Augmented Backus-Naur
-  Form):
+  official CSV grammar from [[https://www.rfc-editor.org/rfc/rfc4180][RFC 4180]], written in [[https://en.wikipedia.org/wiki/Backus%E2%80%93Naur_form][BNF]] (Backus-Naur Form). This
+  simplified grammar assumes that:
 
-  #+begin_example
-
-  file = [header CLRF] record *(CLRF record) [CLRF]
-
-  header = name *(COMMA name)
-
-  record = field *(COMMA field) / enclosed_field *(COMMA enclosed_fielid)
-
-  name = field
-
-  enclosed_field = DQUOTE *(TEXTDATA / COMMA) DQUOTE
-
-  field = *(TEXTDATA)
-
-  COMMA = %x2C
-
-  CR = %x0D
-
-  DQUOTE = %x22
-
-  LF = %x0A
-
-  CRLF = CR LF
-
-  TEXTDATA =  %x20-21 / %x23-2B / %x2D-7E
-
-  #+end_example
-
-  This simplified grammar assumes that:
-
-  1. There may be an optional =header= line appearing as the first line of the
-     file with the same format as normal record lines. This headers will contain
-     =name= (s) corresponding to the =field= (s) in the =file=.
-  2. Each =record= is located on a separate line, delimited by a line break (=CLRF=).
-  3. The last record in the file may or may not have an ending line break.
-  4. Each =record= consints a number of =field= (s) that should be equal to the
-     number of the =names= (s) in the =header=.
-  5. Each =field= consists of a sequence of any ASCII character but the double
-     quote, enclosed between double quotes.
+  * a CSV file is a sequence of =records= (/including the empty sequence/),
+  * a record is structured into =enclosed_fields= (/fields enclosed by double
+    quotes/), separated by =COMMA= (s) and ending in a =CRLF= (/i.e. Carriage Return,
+    Line Feed/),
+  * an enclosed field is structured as a =word= enclosed in =DQUOTE= (s) (/double quotes/),
+  * a =word= is a sequence of *at least* one unicode character, except from
+    commas, double quotes and new lines.
 
   Imposing such limitations to the original grammar, thus to the language it
   generates, largely eases the complexity of our parser. Nonetheless, being this

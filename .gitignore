@@ -1,6 +1,7 @@
 *.o
 *.s
 input*
+reference*
 main
 test
 TAGS
