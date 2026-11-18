@@ -18,48 +18,44 @@ int main(int argc, char **argv)
     const char *file_path = argv[1];
 
     /* reading a file into memory */
-    chopdat_buffer *b1 = chopdat_buffer_create(file_path);
+    chopdat_buffer *b = chopdat_buffer_create(file_path);
 
-    if (!b1) {
+    if (!b) {
         fprintf(stderr, "error: could not read file into memory.\n");
         exit(1);
     }
 
-    size_t s1 = chopdat_buffer_size(b1);
-    char *c1 = chopdat_buffer_content(b1);
+    size_t s = chopdat_buffer_size(b);
+    char *c = chopdat_buffer_content(b);
 
-    printf("\n%ldB\n%s\n", s1, c1);
+    printf("\n%ldB\n%s\n", s, c);
 
-    /* =====| PARSING SIMULATION |===== */
+    /* =====| PARSING |===== */
+    chopdat_csv_table *t = chopdat_csv(b);
+    chopdat_csv_perror e = chopdat_csv_table_errcode(t);
+    int nr = chopdat_csv_table_nrows(t);
+    int nc = chopdat_csv_table_ncols(t);
 
-    /* lexing simulation: manually creatining tokens */
-    chopdat_token *x = chopdat_token_create(&c1[1], 5);
-    chopdat_token *y = chopdat_token_create(&c1[15], 4);
-
-    /* parsing simulation: creating a csv table and manually adding tokens */
-    chopdat_csv_table *t1 = chopdat_csv_table_create();
-    chopdat_csv_table_eattok(t1, x);
-    chopdat_csv_table_eattok(t1, y);
-    chopdat_csv_table_spittok(t1);
-
-    /* freeing memory */
-    chopdat_csv_table_destroy(t1);
-    chopdat_buffer_destroy(b1);
-
-    /* =====| ACTUAL PARSING |===== */
-
-    /* due to the previous buffer being deallocated, the file need to be read
-    into memory again */
-    chopdat_buffer *b2 = chopdat_buffer_create(file_path);
-    chopdat_buffer *nullbuf = NULL;
-    size_t s2 = chopdat_buffer_size(b2);
-    char *c2 = chopdat_buffer_content(b2);
-
-    chopdat_csv_table *t2 = chopdat_csv(nullbuf);
-
-    if (chopdat_csv_table_errcode(t2) == CHOPDAT_CSV_NULLBUF) {
+    switch (e) {
+    case -1:
+        fprintf(stderr, "error: the table is null\n");
+        break;
+    case 0:
+        printf("success: the file %s is well formatted\n", file_path);
+        break;
+    case 1:
         fprintf(stderr, "error: no data to parse\n");
+        break;
+    case 2:
+        fprintf(stderr, "%s:%d:%d error: invalid syntax\n", file_path, nr, nc);
+        break;
+    default:
+        fprintf(stderr, "bollito\n");
+        break;
+
     }
+
+    chopdat_csv_table_destroy(t);
 
     return 0;
 }

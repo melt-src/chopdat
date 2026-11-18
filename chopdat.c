@@ -7,13 +7,11 @@
 #include "chopdat.h"
 #include "dvector/dvector.h"
 
-static chopdat_csv_table *records(chopdat_csv_table *t, chopdat_buffer *b);
+static chopdat_csv_table *record(chopdat_csv_table *t, chopdat_buffer *b);
 static chopdat_csv_table *enclosed_token(chopdat_csv_table *t, chopdat_buffer *b);
 static chopdat_csv_table *token(chopdat_csv_table *t, chopdat_buffer *b);
-static chopdat_csv_table *comma(chopdat_csv_table *t, chopdat_buffer *b);
-static chopdat_csv_table *clrf(chopdat_csv_table *t, chopdat_buffer *b);
+static chopdat_csv_table *crlf(chopdat_csv_table *t, chopdat_buffer *b);
 static chopdat_csv_table *dquote(chopdat_csv_table *t, chopdat_buffer *b);
-static chopdat_csv_table *textdata(chopdat_csv_table *t, chopdat_buffer *b);
 
 struct chopdat_token
 {
@@ -48,11 +46,12 @@ char *chopdat_slurp_file(const char *file_path, size_t *size)
     if (m < 0) goto error;
     if (fseek(f, 0L, SEEK_SET) < 0) goto error;
 
-    buffer = malloc(m * sizeof(char));
+    buffer = malloc(m * sizeof(char) + 1);
 
     if (!buffer) goto error;
 
     size_t n = fread(buffer, 1, m, f);
+    buffer[m] = '\0';
 
     if (ferror(f)) goto error;
     if (n != (size_t) m) goto error;
@@ -149,6 +148,7 @@ chopdat_csv_table *chopdat_csv_table_create(void)
 
     t->rows = 0;
     t->columns = 0;
+    t->error = CHOPDAT_CSV_NOERR;
 
     return t;
 }
@@ -212,7 +212,7 @@ void chopdat_csv_table_spittok(chopdat_csv_table *a)
     }
 }
 
-chopdat_csv_table *chopdat_csv(chopdat_buffer *b)
+chopdat_csv_table *chopdat_csv_file(chopdat_buffer *b)
 {
     chopdat_csv_table *t = chopdat_csv_table_create();
 
@@ -221,94 +221,83 @@ chopdat_csv_table *chopdat_csv(chopdat_buffer *b)
         return t;
     }
 
-    char *d = b->content;
-
-    records(t, b);
-
-    if (t->error != CHOPDAT_CSV_NOERR) return t;
+    while (*(b->content) != '\0') {
+        record(t, b);
+    }
 
     return t;
 }
 
-static chopdat_csv_table *records(chopdat_csv_table *t, chopdat_buffer *b)
+static chopdat_csv_table *record(chopdat_csv_table *t, chopdat_buffer *b)
 {
     t = enclosed_token(t, b);
 
     if (t->error != CHOPDAT_CSV_NOERR) return t;
 
-    t = comma(t, b);
-    size_t s = b->content_size;
+    if (*(b->content) == ',') {
+        size_t s = b->content_size;
+        size_t v = 0;
 
-    if (t->error != CHOPDAT_CSV_NOERR) {
-        for (size_t i = 0; i < s; i++) {
+        while (v < s && *(b->content) == ',') {
+            printf("%c\n", *(b->content));
+            b->content = b->content + 1;
             t = enclosed_token(t, b);
-
             if (t->error != CHOPDAT_CSV_NOERR) return t;
-
-            t = comma(t, b);
-
-            if (t->error != CHOPDAT_CSV_NOERR) break;
-
         }
     }
 
-    return clrf(t, b);
+    return crlf(t, b);
 }
 
-static void enclosed_token(chopdat_csv_table *t, chopdat_buffer *b) {
+static chopdat_csv_table *enclosed_token(chopdat_csv_table *t, chopdat_buffer *b) {
     t = dquote(t, b);
 
-    if (t->error != CHOPDAT_CSV_NOERR) {
-        return t;
-    }
+    if (t->error != CHOPDAT_CSV_NOERR) return t;
 
     t = token(t, b);
 
-    if (t->error != CHOPDAT_CSV_NOERR) {
-        return t;
-    }
+    if (t->error != CHOPDAT_CSV_NOERR) return t;
 
     return dquote(t, b);
 }
 
 
-static void token(chopdat_csv_table *t, chopdat_buffer *b) {
+static chopdat_csv_table *token(chopdat_csv_table *t, chopdat_buffer *b) {
+    size_t s = b->content_size;
+    size_t v = 0;
 
-
-static chopdat_csv_table *comma(chopdat_csv_table *t, chopdat_buffer *b) {
-    if (b->content != ',') {
-        t->error = CHOPDAT_CSV_SYNTAX
+    while (v < s && (*(b->content) != '\r' &&
+                     *(b->content) != '\n' &&
+                     *(b->content) != '"'))
+    {
+        b->content = b->content + 1;
+        v++;
     }
+
+    if (*(b->content) != '"') {
+        t->error = CHOPDAT_CSV_SYNTAX;
+    }
+
     return t;
 }
 
-static chopdat_csv_table *clrf(chopdat_csv_table *t, chopdat_buffer *b) {
-    if (b->content != '\r') {
+static chopdat_csv_table *crlf(chopdat_csv_table *t, chopdat_buffer *b) {
+    if (*(b->content) != '\n') {
         t->error = CHOPDAT_CSV_SYNTAX;
         return t;
     }
 
-    char *c = b->content + 1;
-
-    if (c != '\n') {
-        t->error = CHOPDAT_CSV_SYNTAX;
-    }
-
+    b->content = b->content + 1;
     return t;
 }
 
-static void dquote(chopdat_csv_table *t, chopdat_buffer *b) {
-    if (b->content != '"') {
+static chopdat_csv_table *dquote(chopdat_csv_table *t, chopdat_buffer *b) {
+    if (*(b->content) != '"') {
         t->error = CHOPDAT_CSV_SYNTAX;
+        return t;
     }
-    return t;
-}
 
-static void textdata(chopdat_csv_table *t, chopdat_buffer *b) {
-    char *c = b->content;
-    if (!(c <= 0x10FFFF && c != 0x0A && c != 0x0D && c != 0x22)) {
-        t->error = CHOPDAT_CSV_SYNTAX;
-    }
+    b->content = b->content + 1;
     return t;
 }
 

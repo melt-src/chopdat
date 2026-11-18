@@ -44,7 +44,7 @@ chopdat_csv_perror chopdat_csv_table_errcode(chopdat_csv_table *);
 int chopdat_csv_table_eattok(chopdat_csv_table *, chopdat_token *);
 void chopdat_csv_table_spittok(chopdat_csv_table *);
 
-chopdat_csv_table *chopdat_csv(chopdat_buffer *);
+chopdat_csv_table *chopdat_csv_file(chopdat_buffer *);
 
 #endif /* CHOPDAT_H */
 

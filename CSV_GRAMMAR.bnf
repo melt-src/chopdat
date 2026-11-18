@@ -1,5 +1,6 @@
+file = record file / record
 
-records = enclosed_token COMMA records / enclosed_token CRLF / e
+record = enclosed_token COMMA record / enclosed_token CRLF
 
 enclosed_token = DQUOTE token DQUOTE
 
