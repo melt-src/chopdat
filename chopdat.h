@@ -40,6 +40,7 @@ chopdat_csv_table *chopdat_csv_table_create(void);
 void chopdat_csv_table_destroy(chopdat_csv_table *);
 size_t chopdat_csv_table_nrows(chopdat_csv_table *);
 size_t chopdat_csv_table_ncols(chopdat_csv_table *);
+size_t chopdat_csv_table_ntokens(chopdat_csv_table *);
 chopdat_csv_perror chopdat_csv_table_errcode(chopdat_csv_table *);
 chopdat_token *chopdat_csv_table_spit_token(chopdat_csv_table *, size_t);
 

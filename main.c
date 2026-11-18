@@ -37,6 +37,7 @@ int main(int argc, char **argv)
     chopdat_csv_perror e = chopdat_csv_table_errcode(t);
     int nr = chopdat_csv_table_nrows(t);
     int nc = chopdat_csv_table_ncols(t);
+    size_t nt = chopdat_csv_table_ntokens(t);
 
     switch (e) {
     case -1:
@@ -57,19 +58,18 @@ int main(int argc, char **argv)
 
     }
 
-    chopdat_token *k = chopdat_csv_table_spit_token(t, 0);
-    const char *ks = chopdat_token_start(k);
-    size_t kl = chopdat_token_length(k);
-
-    if (!ks || !kl) {
-        fprintf(stderr, "error: empty token\n");
+    for (size_t i = 0; i < nt; i++) {
+        chopdat_token *k = chopdat_csv_table_spit_token(t, i);
+        const char *ks = chopdat_token_start(k);
+        size_t kl = chopdat_token_length(k);
+        putchar('\n');
+        fwrite(ks, 1, kl, stdout);
+        putchar(' ');
     }
 
-    // fwrite(ks, 1, kl, stdout);
-
-    // if (ferror(stdout)) {
-    //     fprintf(stderr, "error: could not print token: %s\n", strerror(errno));
-    // }
+    if (ferror(stdout)) {
+        fprintf(stderr, "error: could not print token: %s\n", strerror(errno));
+    }
 
     chopdat_csv_table_destroy(t);
     chopdat_buffer_destroy(b);

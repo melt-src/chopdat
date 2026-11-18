@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "chopdat.h"
-#include "dvector/dvctor.h"
+#include "dvector/dvector.h"
 
 static chopdat_csv_table *record(chopdat_csv_table *t, chopdat_buffer *b);
 static chopdat_csv_table *enclosed_token(chopdat_csv_table *t, chopdat_buffer *b);
@@ -24,6 +24,7 @@ struct chopdat_csv_table
     dvector *tokens;
     size_t rows;
     size_t columns;
+    size_t ntokens;
     chopdat_csv_perror error;
 };
 
@@ -180,6 +181,12 @@ size_t chopdat_csv_table_ncols(chopdat_csv_table *t)
     return t->columns;
 }
 
+size_t chopdat_csv_table_ntokens(chopdat_csv_table *t)
+{
+    if (!t) return 0;
+    return t->ntokens;
+}
+
 chopdat_csv_perror chopdat_csv_table_errcode(chopdat_csv_table *t)
 {
     if (!t) return CHOPDAT_CSV_NOTABLE;
@@ -213,6 +220,7 @@ chopdat_csv_table *chopdat_csv_file(chopdat_buffer *b)
     b->content = l;
     t->rows = nr;
     t->columns = t->columns / t->rows + 1;
+    t->ntokens = dvector_length(t->tokens);
     return t;
 }
 
