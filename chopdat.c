@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "chopdat.h"
-#include "dvector/dvector.h"
+#include "dvector/dvctor.h"
 
 static chopdat_csv_table *record(chopdat_csv_table *t, chopdat_buffer *b);
 static chopdat_csv_table *enclosed_token(chopdat_csv_table *t, chopdat_buffer *b);
@@ -106,14 +106,14 @@ int chopdat_buffer_size(chopdat_buffer *b)
     return b->content_size;
 }
 
-chopdat_token *chopdat_token_create(char *s, size_t l)
+chopdat_token *chopdat_token_create(char *s)
 {
     chopdat_token *t = malloc(sizeof(*t));
 
     if (!t) return NULL;
 
     t->start = s;
-    t->length = l;
+    t->length = 0;
 
     return t;
 }
@@ -186,21 +186,11 @@ chopdat_csv_perror chopdat_csv_table_errcode(chopdat_csv_table *t)
     return t->error;
 }
 
-int chopdat_csv_table_eattok(chopdat_csv_table *a, chopdat_token *o)
-{
-    if (!a) return 1;
-    if (!o) return 2;
-    if (dvector_append(a->tokens, o) > 0) return 3;
-    return 0;
-}
-
-char **chopdat_csv_table_spit_tokens(chopdat_csv_table *t)
+chopdat_token *chopdat_csv_table_spit_token(chopdat_csv_table *t, size_t l)
 {
     if (!t) return NULL;
-
-    char **x = (char **) dvector_get_elements(v);
-
-    return x;
+    dvector *v = t->tokens;
+    return dvector_get_element(v, l);
 }
 
 chopdat_csv_table *chopdat_csv_file(chopdat_buffer *b)
@@ -269,6 +259,8 @@ static chopdat_csv_table *token(chopdat_csv_table *t, chopdat_buffer *b) {
         return t;
     }
 
+    chopdat_token *k = chopdat_token_create(b->content);
+
     while (v < s && (*(b->content) != '\n' && *(b->content) != '"'))
     {
         b->content = b->content + 1;
@@ -277,9 +269,11 @@ static chopdat_csv_table *token(chopdat_csv_table *t, chopdat_buffer *b) {
 
     if (*(b->content) != '"') {
         t->error = CHOPDAT_CSV_SYNTAX;
+        chopdat_token_destroy(k);
+        return t;
     }
 
-    chopdat_token *k = chopdat_token_create(b->content, v);
+    k->length = v;
     dvector_append(t->tokens, k);
 
     return t;

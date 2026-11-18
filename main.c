@@ -1,5 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <errno.h>
 #include "chopdat.h"
 
 #define MIN_NARGS 2
@@ -55,8 +57,19 @@ int main(int argc, char **argv)
 
     }
 
-    char **x = chopdat_csv_table_spittoks(t);
-    printf("%s\n", *x[0]);
+    chopdat_token *k = chopdat_csv_table_spit_token(t, 0);
+    const char *ks = chopdat_token_start(k);
+    size_t kl = chopdat_token_length(k);
+
+    if (!ks || !kl) {
+        fprintf(stderr, "error: empty token\n");
+    }
+
+    // fwrite(ks, 1, kl, stdout);
+
+    // if (ferror(stdout)) {
+    //     fprintf(stderr, "error: could not print token: %s\n", strerror(errno));
+    // }
 
     chopdat_csv_table_destroy(t);
     chopdat_buffer_destroy(b);
