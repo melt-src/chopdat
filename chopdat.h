@@ -42,7 +42,7 @@ size_t chopdat_csv_table_nrows(chopdat_csv_table *);
 size_t chopdat_csv_table_ncols(chopdat_csv_table *);
 chopdat_csv_perror chopdat_csv_table_errcode(chopdat_csv_table *);
 int chopdat_csv_table_eattok(chopdat_csv_table *, chopdat_token *);
-void chopdat_csv_table_spittok(chopdat_csv_table *);
+char **chopdat_csv_table_spit_tokens(chopdat_csv_table *);
 
 chopdat_csv_table *chopdat_csv_file(chopdat_buffer *);
 

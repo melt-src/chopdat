@@ -41,7 +41,7 @@ int main(int argc, char **argv)
         fprintf(stderr, "error: the table is null\n");
         break;
     case 0:
-        printf("success: the file %s is well formatted\n", file_path);
+        printf("success: the file \"%s\" (%d,%d) is well formatted\n", file_path, nr, nc);
         break;
     case 1:
         fprintf(stderr, "error: no data to parse\n");
@@ -55,7 +55,11 @@ int main(int argc, char **argv)
 
     }
 
+    char **x = chopdat_csv_table_spittoks(t);
+    printf("%s\n", *x[0]);
+
     chopdat_csv_table_destroy(t);
+    chopdat_buffer_destroy(b);
 
     return 0;
 }

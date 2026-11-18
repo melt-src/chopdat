@@ -194,22 +194,13 @@ int chopdat_csv_table_eattok(chopdat_csv_table *a, chopdat_token *o)
     return 0;
 }
 
-void chopdat_csv_table_spittok(chopdat_csv_table *a)
+char **chopdat_csv_table_spit_tokens(chopdat_csv_table *t)
 {
-    if (!a) return;
+    if (!t) return NULL;
 
-    dvector *v = a->tokens;
-    int m = dvector_length(v);
+    char **x = (char **) dvector_get_elements(v);
 
-    if (m < 0) return;
-
-    for (int i = 0; i < m; i++) {
-        chopdat_token *t = dvector_get_element(v, i);
-        if (t) {
-            fwrite(t->start, 1, t->length, stdout);
-            putchar('\n');
-        }
-    }
+    return x;
 }
 
 chopdat_csv_table *chopdat_csv_file(chopdat_buffer *b)
@@ -221,10 +212,17 @@ chopdat_csv_table *chopdat_csv_file(chopdat_buffer *b)
         return t;
     }
 
+    char *l = b->content;
+    size_t nr = 0;
+
     while (*(b->content) != '\0' && t->error == CHOPDAT_CSV_NOERR) {
         record(t, b);
+        nr = nr + 1;
     }
 
+    b->content = l;
+    t->rows = nr;
+    t->columns = t->columns / t->rows + 1;
     return t;
 }
 
@@ -239,7 +237,7 @@ static chopdat_csv_table *record(chopdat_csv_table *t, chopdat_buffer *b)
         size_t v = 0;
 
         while (v < s && *(b->content) == ',') {
-            printf("%c\n", *(b->content));
+            t->columns = t->columns + 1;
             b->content = b->content + 1;
             t = enclosed_token(t, b);
             if (t->error != CHOPDAT_CSV_NOERR) return t;
@@ -266,9 +264,12 @@ static chopdat_csv_table *token(chopdat_csv_table *t, chopdat_buffer *b) {
     size_t s = b->content_size;
     size_t v = 0;
 
-    while (v < s && (*(b->content) != '\r' &&
-                     *(b->content) != '\n' &&
-                     *(b->content) != '"'))
+    if (*(b->content) == '\n' || *(b->content) == '"') {
+        t->error = CHOPDAT_CSV_NOERR;
+        return t;
+    }
+
+    while (v < s && (*(b->content) != '\n' && *(b->content) != '"'))
     {
         b->content = b->content + 1;
         v++;
@@ -277,6 +278,9 @@ static chopdat_csv_table *token(chopdat_csv_table *t, chopdat_buffer *b) {
     if (*(b->content) != '"') {
         t->error = CHOPDAT_CSV_SYNTAX;
     }
+
+    chopdat_token *k = chopdat_token_create(b->content, v);
+    dvector_append(t->tokens, k);
 
     return t;
 }
