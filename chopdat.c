@@ -221,7 +221,7 @@ chopdat_csv_table *chopdat_csv_file(chopdat_buffer *b)
         return t;
     }
 
-    while (*(b->content) != '\0') {
+    while (*(b->content) != '\0' && t->error == CHOPDAT_CSV_NOERR) {
         record(t, b);
     }
 

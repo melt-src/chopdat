@@ -31,7 +31,7 @@ int main(int argc, char **argv)
     printf("\n%ldB\n%s\n", s, c);
 
     /* =====| PARSING |===== */
-    chopdat_csv_table *t = chopdat_csv(b);
+    chopdat_csv_table *t = chopdat_csv_file(b);
     chopdat_csv_perror e = chopdat_csv_table_errcode(t);
     int nr = chopdat_csv_table_nrows(t);
     int nc = chopdat_csv_table_ncols(t);
